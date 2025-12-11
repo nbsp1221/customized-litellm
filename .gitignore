@@ -31,3 +31,6 @@ Thumbs.db
 *.bak
 *.backup
 *~
+
+# LiteLLM
+litellm/

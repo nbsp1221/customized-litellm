@@ -18,9 +18,7 @@ services:
       retries: 10
 
   litellm:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/berriai/litellm:main-stable
     container_name: litellm
     restart: unless-stopped
     environment:
@@ -31,6 +29,7 @@ services:
       - UI_PASSWORD=${LITELLM_UI_PASSWORD}
     volumes:
       - ./litellm-config.yaml:/app/config.yaml
+      - ./litellm:/root/.config/litellm
     expose:
       - ${LITELLM_PORT}
     networks:
@@ -41,7 +40,7 @@ services:
         condition: service_healthy
     command: ["--config", "/app/config.yaml", "--port", "${LITELLM_PORT}", "--num_workers", "8"]
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:${LITELLM_PORT}/health/readiness"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/readiness', timeout=5)"]
       interval: 30s
       timeout: 10s
       retries: 3
